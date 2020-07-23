@@ -18,6 +18,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"github.com/jedib0t/go-pretty/table"
 	"github.com/sachaos/go-starz/lib"
 	"github.com/spf13/cobra"
 	"os"
@@ -61,11 +62,17 @@ func run(cmd *cobra.Command, args []string) {
 		return filtered[i].StargazersCount > filtered[j].StargazersCount
 	})
 
-	fmt.Printf("Total: %d\n\n", total)
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.SetStyle(table.StyleLight)
 
 	for _, starz := range filtered {
-		fmt.Printf("%s %d\n", starz.Name, starz.StargazersCount)
+		t.AppendRow(table.Row{starz.Name, starz.StargazersCount})
 	}
+
+	t.AppendFooter(table.Row{"Total", total})
+
+	t.Render()
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
