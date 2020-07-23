@@ -16,9 +16,12 @@ limitations under the License.
 package cmd
 
 import (
+	"context"
 	"fmt"
+	"github.com/sachaos/go-starz/lib"
 	"github.com/spf13/cobra"
 	"os"
+	"sort"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
@@ -28,17 +31,41 @@ var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "go-starz",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Use:   "go-starz [username]",
+	Short: "GitHub stars",
+	Args: cobra.ExactArgs(1),
+	Run: run,
+}
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	//	Run: func(cmd *cobra.Command, args []string) { },
+func run(cmd *cobra.Command, args []string) {
+	username := args[0]
+	client := lib.NewClient()
+
+	list, err := client.GetStarzList(context.Background(), username)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	total := 0
+	filtered := make([]*lib.Starz, 0, len(list))
+	for _, starz := range list {
+		total += starz.StargazersCount
+
+		if starz.StargazersCount > 0 {
+			filtered = append(filtered, starz)
+		}
+	}
+
+	sort.Slice(filtered, func(i, j int) bool {
+		return filtered[i].StargazersCount > filtered[j].StargazersCount
+	})
+
+	fmt.Printf("Total: %d\n\n", total)
+
+	for _, starz := range filtered {
+		fmt.Printf("%s %d\n", starz.Name, starz.StargazersCount)
+	}
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -58,10 +85,6 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.go-starz.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 // initConfig reads in config file and ENV variables if set.
