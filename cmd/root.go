@@ -66,6 +66,8 @@ func run(cmd *cobra.Command, args []string) {
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleLight)
 
+	t.AppendHeader(table.Row{"Name", "Star Count"})
+
 	for _, starz := range filtered {
 		t.AppendRow(table.Row{starz.Name, starz.StargazersCount})
 	}
