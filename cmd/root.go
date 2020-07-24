@@ -42,6 +42,18 @@ func run(cmd *cobra.Command, args []string) {
 	username := args[0]
 	client := lib.NewClient()
 
+	limit, err := cmd.Flags().GetInt("limit")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	thresh, err := cmd.Flags().GetInt("thresh")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
 	list, err := client.GetStarzList(context.Background(), username)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -53,7 +65,7 @@ func run(cmd *cobra.Command, args []string) {
 	for _, starz := range list {
 		total += starz.StargazersCount
 
-		if starz.StargazersCount > 0 {
+		if starz.StargazersCount >= thresh {
 			filtered = append(filtered, starz)
 		}
 	}
@@ -68,8 +80,14 @@ func run(cmd *cobra.Command, args []string) {
 
 	t.AppendHeader(table.Row{"Name", "Star Count"})
 
+	var cnt = 0
 	for _, starz := range filtered {
+		if limit != -1 && cnt >= limit {
+			continue
+		}
+
 		t.AppendRow(table.Row{starz.Name, starz.StargazersCount})
+		cnt++
 	}
 
 	t.AppendFooter(table.Row{"Total", total})
@@ -94,6 +112,9 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.go-starz.yaml)")
+
+	rootCmd.Flags().IntP("limit", "l", -1, "Only show this many repos. -1 means infinite")
+	rootCmd.Flags().IntP("thresh", "t", 1, "Only show repos above this threshold.")
 }
 
 // initConfig reads in config file and ENV variables if set.
