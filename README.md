@@ -1,6 +1,8 @@
 # go-starz
 
-Display GitHub star counts.
+Show GitHub stars count.
+
+# Example
 
 ```
 $ go-starz sachaos
@@ -30,6 +32,22 @@ $ go-starz sachaos
 ├───────────────────────────────┼────────────┤
 │ TOTAL                         │       1382 │
 └───────────────────────────────┴────────────┘
+```
+
+# Install
+
+## Mac OS X
+
+```shell
+$ brew install sachaos/tap/go-starz
+```
+
+## Build it yourself
+
+You need go 1.14.
+
+```shell
+$ go get https://github.com/sachaos/go-starz.git
 ```
 
 # Inspired by
