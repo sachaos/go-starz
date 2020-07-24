@@ -11,6 +11,10 @@ builds:
       - windows
     goarch:
       - amd64
+      - arm
+    goarm:
+      - 6
+      - 7
     ldflags:
       - -s -w -X github.com/sachaos/go-starz/cmd.version={{.Version}}
 archives:
