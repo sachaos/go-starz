@@ -29,13 +29,15 @@ import (
 )
 
 var cfgFile string
+var version string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "go-starz [username]",
-	Short: "GitHub stars",
-	Args: cobra.ExactArgs(1),
-	Run: run,
+	Use:     "go-starz [username]",
+	Short:   "GitHub stars",
+	Args:    cobra.ExactArgs(1),
+	Version: version,
+	Run:     run,
 }
 
 func run(cmd *cobra.Command, args []string) {
