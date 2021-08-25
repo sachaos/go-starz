@@ -2,22 +2,23 @@ before:
   hooks:
     - go mod download
 builds:
-  - env:
+  - <<: &build_defaults
+      binary: go-starz
+      ldflags:
+        - -s -w -X github.com/sachaos/go-starz/cmd.version={{.Version}}
+    id: macos
+    goos: [darwin]
+    goarch: [amd64]
+  - <<: *build_defaults
+    id: linux
+    goos: [linux]
+    goarch: [386, arm, amd64, arm64]
+    env:
       - CGO_ENABLED=0
-    binary: go-starz
-    goos:
-      - darwin
-      - linux
-      - windows
-    goarch:
-      - amd64
-      - arm64
-      - arm
-    goarm:
-      - 6
-      - 7
-    ldflags:
-      - -s -w -X github.com/sachaos/go-starz/cmd.version={{.Version}}
+  - <<: *build_defaults
+    id: windows
+    goos: [windows]
+    goarch: [386, amd64]
 checksum:
   name_template: 'checksums.txt'
 snapshot:
