@@ -35,7 +35,7 @@ changelog:
       - '^docs:'
       - '^test:'
 brews:
-  - github:
+  - tap:
       owner: sachaos
       name: homebrew-tap
     folder: Formula
