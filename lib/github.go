@@ -13,8 +13,8 @@ type User struct {
 }
 
 type Starz struct {
-	Name string `json:"name"`
-	StargazersCount int `json:"stargazers_count"`
+	Name            string `json:"name"`
+	StargazersCount int    `json:"stargazers_count"`
 }
 
 type GitHub interface {
@@ -34,6 +34,10 @@ func (c *client) GetStarzList(ctx context.Context, username string) ([]*Starz, e
 		return nil, err
 	}
 
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to get starz list: %s", res.Status)
+	}
+
 	var user User
 	err = json.NewDecoder(res.Body).Decode(&user)
 	if err != nil {
@@ -49,6 +53,10 @@ func (c *client) GetStarzList(ctx context.Context, username string) ([]*Starz, e
 			return nil, err
 		}
 
+		if res.StatusCode != http.StatusOK {
+			return nil, fmt.Errorf("failed to get starz list: %s", res.Status)
+		}
+
 		var starz []*Starz
 		err = json.NewDecoder(res.Body).Decode(&starz)
 		if err != nil {
@@ -60,4 +68,3 @@ func (c *client) GetStarzList(ctx context.Context, username string) ([]*Starz, e
 
 	return allStarz, nil
 }
-
