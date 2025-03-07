@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,11 +18,12 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"os"
+	"sort"
+
 	"github.com/jedib0t/go-pretty/table"
 	"github.com/sachaos/go-starz/lib"
 	"github.com/spf13/cobra"
-	"os"
-	"sort"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
@@ -41,8 +42,9 @@ var rootCmd = &cobra.Command{
 }
 
 func run(cmd *cobra.Command, args []string) {
+	token := os.Getenv("GITHUB_TOKEN")
 	username := args[0]
-	client := lib.NewClient()
+	client := lib.NewClient(token)
 
 	limit, err := cmd.Flags().GetInt("limit")
 	if err != nil {

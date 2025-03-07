@@ -22,14 +22,24 @@ type GitHub interface {
 }
 
 type client struct {
+	token string
 }
 
-func NewClient() *client {
-	return &client{}
+func NewClient(token string) *client {
+	return &client{token: token}
 }
 
 func (c *client) GetStarzList(ctx context.Context, username string) ([]*Starz, error) {
-	res, err := http.Get(fmt.Sprintf("https://api.github.com/users/%s", username))
+	req, err := http.NewRequest("GET", fmt.Sprintf("https://api.github.com/users/%s", username), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.token != "" {
+		req.Header.Set("Authorization", "Bearer "+c.token)
+	}
+
+	client := &http.Client{}
+	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +58,15 @@ func (c *client) GetStarzList(ctx context.Context, username string) ([]*Starz, e
 
 	var allStarz []*Starz
 	for i := 1; i <= pageCount; i++ {
-		res, err := http.Get(fmt.Sprintf("https://api.github.com/users/%s/repos?per_page=100&page=%d", username, i))
+		req, err := http.NewRequest("GET", fmt.Sprintf("https://api.github.com/users/%s/repos?per_page=100&page=%d", username, i), nil)
+		if err != nil {
+			return nil, err
+		}
+		if c.token != "" {
+			req.Header.Set("Authorization", "Bearer "+c.token)
+		}
+
+		res, err := client.Do(req)
 		if err != nil {
 			return nil, err
 		}
